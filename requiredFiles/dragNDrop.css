@@ -1,0 +1,109 @@
+body {
+	background-color:black;
+	position: relative;
+	top:-10px;
+	left:-5px;
+	width:100%;
+	z-index: 1;
+}
+
+.dragAndDrop {
+    background-color: rgb(230,230,230);
+	position:relative;
+}
+
+#dropArea { 
+	top:0px;
+	left:0px;
+	padding-top:20px;
+	padding-bottom:20px;
+	width:100%;
+	z-index: 2;
+}
+
+#dropLinerOuter {
+	position:relative;
+	background-color: rgb(230,230,230);
+	padding:11px;
+	width:76%;
+	left:12%;
+	z-index: 3;
+	transition: background-color 0.5s;
+}
+
+.filehover {
+	background-color: rgb(153,230,255);
+}
+
+#dropLinerOuter:hover {
+	background-color: rgb(255,255,255);
+}
+
+#dropLinerOuter:hover > #dropLiner {
+	outline-color: rgb(140,140,140);
+	background-color: rgb(255,255,255);
+}
+
+#dropLiner {
+	position:relative;
+	outline-style: dashed;
+	outline-color: rgb(204,204,204);
+	padding:10px;
+	z-index: 3;
+	transition: all 0.5s;
+}
+
+#dropContent {
+	position:relative;
+	padding-top: 1px;
+	padding-bottom: 1px;
+	width:100%;
+	top:0px;
+	left:0%;
+	z-index: 4;
+}
+
+#dropText {
+	position:relative;
+	display: inline-block;
+	width:49%;
+	top:0px;
+	left:5%;
+	z-index: 5;
+}
+
+#fileLoaded {
+	position:relative;
+	display: inline-block;
+	width:30%;
+	top:0px;
+	left:0px;
+	z-index: 5;
+}
+
+#loadtext {
+	color:rgb(255,100,100);
+}
+
+.beginText {
+	display: inline-block;
+}
+
+#fileselect {
+	display:inline-block;
+}
+
+.messages {
+	padding:0;
+	margin:0;
+	background-color:white;
+}
+
+.indent {
+	position:relative;
+	left:5%;
+}
+
+#togglebutton {
+	margin:10px;
+}

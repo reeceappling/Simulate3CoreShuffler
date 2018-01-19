@@ -1,0 +1,77 @@
+<html><!-- DONT RUN AS ADMINISTRATOR -->
+	<head>
+		<title></title><!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+		<!-- Script Libraries -->
+		<script src="requiredFiles/libs/jquery.js"></script>
+		<!--Custom Scripts -->
+		<script src="requiredFiles/vanillajs.js"></script>
+		<script src="requiredFiles/fileDragNDrop.js"></script>
+		<script src="requiredFiles/core.js"></script>
+		<!--Custom Stylesheets -->
+		<link rel="stylesheet" href="requiredFiles/dragNDrop.css">
+		<link rel="stylesheet" href="requiredFiles/workspace.css">
+	</head>
+	<body>
+	
+		<!-- Drag and drop area -->
+		<div id="dropArea" class="dragAndDrop" ondrop="drop_handler(event);" ondragover="dragover_handler(event);" ondragend="dragend_handler(event);">
+			<div id="dropLinerOuter">
+				<div id="dropLiner">
+					<div id="dropContent">
+						<div id="dropText">
+								<h3 id="filedroptext" class="beginText dropnote">Drag .out file here to begin, or </h3>
+								<input type="file" id="fileselect" name="fileselect[]" style="display: none;">
+								<input type="button" value="Choose File" onclick="document.getElementById('fileselect').click();" />
+						</div>
+						<div id="fileLoaded">
+							<h3 id="loadtext" class="beginText">
+								No file currently loaded
+							</h3>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- Working area -->
+		<div id="workspace" class="workarea">
+			<div style="height:20px;background:linear-gradient(rgb(230,230,230),white);"></div>
+			<div id="info_and_new" class="workarea" style="background-color:white;">
+				<div class="toolbar"><input type="button" value="Reset Core" onclick="resetCore();" /></div>
+				<div id="coreinfo" class="toolbar"><strong>Fresh</strong>/<strong>Old</strong>/<strong>Total</strong> Assemblies: <span id="freshassembs">0/0/0</span></div>
+				<div id="newrods" class="toolbar">
+					<div id="rodtools">
+						<input type="button" value="Add a new rod field" onclick="addnewrodfield()" id="addnewrodfield"/>
+					</div>
+					<div id="rodsettings">
+					</div>
+				</div>
+				<!-- stats, #newrods, #oldrods--------------------------------------------------------------->
+				<!-- fields, new rod stuff------------------------------------------------------------------->
+				<!-- buttons, reset core, download input file ----------------------------------------------->
+			</div>
+			<div style="height:20px;background:linear-gradient(white,black);"></div>
+			<div style="height:10px;background-color:black;"></div>
+			<div id="corearea" class="workarea">
+				<div id="oldcore" class="fullcore">
+				</div>
+				<div id="octant"><!-- listeners and click functionality, mapping,etc ----------------------->
+					<div id="secsI" class="section"><div id="secvert" class="section"></div><div id="seccent" class="section"></div></div>
+					<div id="secsII" class="section"><div id="secoct" class="section"></div><div id="secangle" class="section"></div></div>
+				</div>
+				<div id="newcore" class="fullcore">
+				</div>
+			</div>
+		</div>
+		<!-- Dev Console -->
+		<div id="messages" style="background-color:white;position:relative;top:0px;">
+			<div style="height:5px;background-color:black;"></div>
+			<div style="height:40px;background:linear-gradient(black,white);"></div>
+			<input type="button" value="Toggle Console" onclick="toggleconsole()" id="togglebutton"/>
+			<div id="msgs" class="messages"></div>
+			<div style="height:20px;background:linear-gradient(white,black);"></div>
+		</div>
+		
+		<!-- End of documant -->
+	</body>
+</html>
