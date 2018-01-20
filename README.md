@@ -10,3 +10,5 @@ Drag and drop in the subsections to shuffle existing assemblies,
 Doubleclick an assembly in a subsection,
 If the clicked rod is not silicide it will replace it with the new rod selected in new rod fields
 If the clicked rod is silicide it will change it to whatever non-silicide rod which would be shuffled there
+
+The most updated version of the code can be found at https://github.com/kamikazi3728/Simulate3CoreShuffler

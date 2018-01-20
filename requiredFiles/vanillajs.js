@@ -41,3 +41,9 @@ function strToObj(str){
 function toggleconsole(){
 	$('#msgs').toggle();
 }
+
+//--------------------------------------------------------------------------FOR TESTING ONLY
+function checkpoint(){
+	tempconst++;
+	Output("checkpoint "+tempconst+"<br>");
+}
