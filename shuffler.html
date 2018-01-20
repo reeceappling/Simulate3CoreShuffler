@@ -1,6 +1,7 @@
 <html><!-- DONT RUN AS ADMINISTRATOR -->
 	<head>
-		<title></title><!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+		<title>Shuffler</title>
+		<!-- ADD PAGE ICON -------------------------------------------------------------->
 		<!-- Script Libraries -->
 		<script src="requiredFiles/libs/jquery.js"></script>
 		<!--Custom Scripts -->
@@ -67,7 +68,7 @@
 		<div id="messages" style="background-color:white;position:relative;top:0px;">
 			<div style="height:5px;background-color:black;"></div>
 			<div style="height:40px;background:linear-gradient(black,white);"></div>
-			<input type="button" value="Toggle Console" onclick="toggleconsole()" id="togglebutton"/>
+			<input type="button" class="bottombutton" value="Toggle Console" onclick="toggleconsole()" id="togglebutton"/><input type="button" class="bottombutton" value="Download Results" onclick="generateresults()" id="resultGen"/>
 			<div id="msgs" class="messages"></div>
 			<div style="height:20px;background:linear-gradient(white,black);"></div>
 		</div>

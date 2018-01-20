@@ -104,6 +104,11 @@ body {
 	left:5%;
 }
 
-#togglebutton {
+.bottombutton {
 	margin:10px;
+	display: inline-block;
+}
+
+#resultGen {
+	float:right;
 }
