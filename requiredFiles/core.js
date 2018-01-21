@@ -11,8 +11,9 @@ var output;
 var dragSrc; //initialize element to hold item drag source
 var endcell;
 var prevcycle =0;
-
+var OCDate = 0;
 var tempconst=0;
+var oldfiledata;
 
 //define constants
 var octms = [2,0,1,2,3,4]; //constant per row for octant table shaping
@@ -174,6 +175,7 @@ function loadFile(file){
 	//read file as text
 	var reader = new FileReader();
 	reader.onload = function(e) {
+		oldfiledata = reader.result;
 		loadWorkspace(reader.result);
 	}
 	reader.readAsText(file);
@@ -191,7 +193,7 @@ function loadWorkspace(rawfiletext){
 	prevcycle = Number(cycstr.split(" ")[cycstr.split(" ").length-1]);
 	//get raw label core array
 	var rawlabels = rawfiletext.split('\'FUE.LAB\' 6/')[1].split('  0  0     FUE.LAB/SER OR BPR.SER')[0].split("\n");
-										//for serial .split('\'FUE.SER\' 6/');
+										//for serial .split('\'FUE.SER\' 6/');//-------------------------------------------
 	//note: rawlabels starts finding data on [1], ends on [15]
 	//make array of labels
 	labels = [];
@@ -564,11 +566,7 @@ function typenum(celltype){
 //reset core to most recent file
 function resetCore(){
 	if(canreset){
-		ParseFile(recentFile);
-		repaint();
-	}
-	else{
-		//cant reset, notify--------------------------------------------------------
+		loadWorkspace(oldfiledata);
 	}
 }
 
@@ -829,7 +827,8 @@ function generateresults(){
 	var fileresults = "";
 	fileresults = fileresults.concat("\'DIM.PWR\' 15 15 15 0/\n\'DIM.CAL\' "+prevcycle+" 2 2 1/\n\'DIM.DEP\' \'HTMO\' \'HTFU\' \'SAM\' \'HBOR\' \'EXP\' \'PIN\' \'EBP\'/\n\n\'FUE.LAB\' 6/\n");
 	fileresults = fileresults.concat(outputCore());
-	fileresults = fileresults.concat("\n\n\n\'COM\'               SERIAL   NUMBER TO    FUEL    BATCH\n\'COM\'               LABEL     CREATE	  TYPE   NUMBER\n");
+	fileresults = fileresults.concat(" 0  0     FUE.LAB/SER OR BPR.SER\n\'COM\'/\n");
+	fileresults = fileresults.concat("\n\'COM\'               SERIAL   NUMBER TO    FUEL    BATCH\n\'COM\'               LABEL     CREATE	  TYPE   NUMBER\n");
 	//FUE NEW CARDS-------------- EX:\'FUE.NEW\' \'TYPE01\', \'sil00\',	  97,        44,    ,,1/\n ----------------------------------------
 		//	'FUE.NEW' 'TYPE01', 'sil00',	  97,        44,    ,,1/
 		// 97 - number of rod type
@@ -940,10 +939,9 @@ function getBlankSpace(row){
 	return null;
 }
 
-function checkpoint(){
-	tempconst++;
-	Output("checkpoint "+tempconst+"<br>");
-}
+//make sure output from silicide rods is xx--01 not xx--1
+
+//no core resize on rod insertion ------------------------------------------------
 
 //double click insert on new core, not octant
 //--------------------------------------------------------------------------------
@@ -957,6 +955,15 @@ function checkpoint(){
  //use generated TAB.TFU/etc and full core to generate .inp file
  //-------------------------------------------------------------------------------
  
+ //fuel zones -----------------------------------------------------------
+ 
+ //enrichments -------------------------------------------------------
+ 
+ //number of rods of a specific type near rod form ------------------------------
+ 
+ //keep WABA IFBA RADIO values on field addition and deleteion-------------
+ 
+ //get old cycle end date, from DEP CYC like cycle number (variable already set,OCDate)----------------------------------------------
  
  //maybe
  //check # silicide rods
