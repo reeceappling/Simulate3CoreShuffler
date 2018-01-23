@@ -26,6 +26,7 @@ function ParseFile(file) {
 		$('#loadtext').html("Current file: "+file.name);
 		$('#filedroptext').html("Drag another .out file here to reset, or");
 		$('#loadtext').css("color","green");
+		$('#dropArea').slideUp();
 		loadFile(file);
 	}
 	else {

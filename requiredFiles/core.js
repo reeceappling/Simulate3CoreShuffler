@@ -1,4 +1,5 @@
 //Define variables
+//ON DEPLOYMENT COLLAPSE(/**/)
 var allassemblies = [];
 var centarray = [];
 var vertarray = [];
@@ -7,6 +8,7 @@ var octantarray = [];
 var newassemblies = [];
 var labels = [];
 var exposures =[];
+//ON DEPLOYMENT COLLAPSE(/**/)
 var output;
 var dragSrc; //initialize element to hold item drag source
 var endcell;
@@ -30,10 +32,10 @@ function Assembly(label, exposure,layout,row,col) {
 	this.col = col; //originating col
 }
 
-function moveableAssembly(originalsection,octantnumber,newrod,exposure){
+function moveableAssembly(originalsection,octantnumber,newassembly,exposure){
 	this.div = originalsection;
 	this.exposure = exposure;
-	this.newrod = newrod;//0 if not new, increment otherwise based on new rods
+	this.newassembly = newassembly;//0 if not new, increment otherwise based on new assemblys
 	this.pos = octantnumber;//position within the octant
 }
 
@@ -102,8 +104,8 @@ function genOctTab(x,y,div,z){
  
  //ON DOCUMENT START
 $( document ).ready(function() {
-	//hide new rod button
-	$('#addnewrodfield').hide();
+	//hide new assembly button
+	$('#addnewassemblyfield').hide();
 	//generate blank core tables
 	/*#oldcore table*/maketable("#oldcore");
 	/*#newcore table*/maketable("#newcore");
@@ -182,11 +184,11 @@ function loadFile(file){
 }
 
 function loadWorkspace(rawfiletext){
-	//show rod field add button
-	$('#addnewrodfield').show();
-	//if no rod fields, add first and set # to 0
-	if($('.rodform').length==0){
-		addnewrodfield();
+	//show assembly field add button
+	$('#addnewassemblyfield').show();
+	//if no assembly fields, add first and set # to 0
+	if($('.assemblyform').length==0){
+		addnewassemblyfield();
 	}
 	//get previous cycle number from DEP.CYC
 	var cycstr = rawfiletext.match(/\'DEP\.CYC\'\s\'c1c\d{2}\'\s\.0{3}\s\d{2}/)[0];
@@ -263,11 +265,11 @@ function loadWorkspace(rawfiletext){
 				}
 			}
 	//load assembly stats
-	$('#freshassembs').html("<strong>"+totnewrods()+"</strong> / <strong>"+numbernewrods(0)+"</strong> / <strong>"+(Number(totnewrods())+Number(numbernewrods(0)))+"</strong>");
+	$('#freshassembs').html("<strong>"+totnewassemblys()+"</strong> / <strong>"+numbernewassemblys(0)+"</strong> / <strong>"+(Number(totnewassemblys())+Number(numbernewassemblys(0)))+"</strong>");
 }
 
-function getcolor(exposure,newrod){
-	if(newrod==0){
+function getcolor(exposure,newassembly){
+	if(newassembly==0){
 		if(exposure<32.5){
 			return "rgb("+Math.round(exposure*2*255/65)+",255,0)";
 		}
@@ -313,57 +315,57 @@ function repaint(){
 	for(var i=0;i<15;i++){
 		for(var j=0;j<15;j++){
 			if(i==7&&j==7){//center
-				if(getMoveableAssembly({div:"seccent",row:0,col:0}).newrod!=0){
-					$('#newcore').find('tr').eq(i).find('td').eq(j).html(getMoveableAssembly({div:"seccent",row:0,col:0}).newrod);
+				if(getMoveableAssembly({div:"seccent",row:0,col:0}).newassembly!=0){
+					$('#newcore').find('tr').eq(i).find('td').eq(j).html(getMoveableAssembly({div:"seccent",row:0,col:0}).newassembly);
 				}
 				else{
 					$('#newcore').find('tr').eq(i).find('td').eq(j).html("");
 				}
-				$('#newcore').find('tr').eq(i).find('td').eq(j).css('background-color',getcolor(getMoveableAssembly({div:"seccent",row:0,col:0}).exposure,getMoveableAssembly({div:"seccent",row:0,col:0}).newrod));
+				$('#newcore').find('tr').eq(i).find('td').eq(j).css('background-color',getcolor(getMoveableAssembly({div:"seccent",row:0,col:0}).exposure,getMoveableAssembly({div:"seccent",row:0,col:0}).newassembly));
 			}
 			else{
 				if(i!=7&&j==7){//axial
 					if(i<7){
-						if(getMoveableAssembly({div:"secvert",row:i,col:0}).newrod==0){
+						if(getMoveableAssembly({div:"secvert",row:i,col:0}).newassembly==0){
 							$('#newcore').find('tr').eq(i).find('td').eq(j).html(" ");
 							$('#newcore').find('tr').eq(j).find('td').eq(i).html(" ");
 						}
 						else{
-							$('#newcore').find('tr').eq(i).find('td').eq(j).html(getMoveableAssembly({div:"secvert",row:i,col:0}).newrod);
-							$('#newcore').find('tr').eq(j).find('td').eq(i).html(getMoveableAssembly({div:"secvert",row:i,col:0}).newrod);
+							$('#newcore').find('tr').eq(i).find('td').eq(j).html(getMoveableAssembly({div:"secvert",row:i,col:0}).newassembly);
+							$('#newcore').find('tr').eq(j).find('td').eq(i).html(getMoveableAssembly({div:"secvert",row:i,col:0}).newassembly);
 						}
-						$('#newcore').find('tr').eq(i).find('td').eq(j).css('background-color',getcolor(getMoveableAssembly({div:"secvert",row:i,col:0}).exposure,getMoveableAssembly({div:"secvert",row:i,col:0}).newrod));
-						$('#newcore').find('tr').eq(j).find('td').eq(i).css('background-color',getcolor(getMoveableAssembly({div:"secvert",row:i,col:0}).exposure,getMoveableAssembly({div:"secvert",row:i,col:0}).newrod));
+						$('#newcore').find('tr').eq(i).find('td').eq(j).css('background-color',getcolor(getMoveableAssembly({div:"secvert",row:i,col:0}).exposure,getMoveableAssembly({div:"secvert",row:i,col:0}).newassembly));
+						$('#newcore').find('tr').eq(j).find('td').eq(i).css('background-color',getcolor(getMoveableAssembly({div:"secvert",row:i,col:0}).exposure,getMoveableAssembly({div:"secvert",row:i,col:0}).newassembly));
 					}
 					else{
-						if(getMoveableAssembly({div:"secvert",row:Math.abs(i-14),col:0}).newrod==0){
+						if(getMoveableAssembly({div:"secvert",row:Math.abs(i-14),col:0}).newassembly==0){
 							$('#newcore').find('tr').eq(i).find('td').eq(j).html(" ");
 							$('#newcore').find('tr').eq(j).find('td').eq(i).html(" ");
 						}
 						else{
-							$('#newcore').find('tr').eq(i).find('td').eq(j).html(getMoveableAssembly({div:"secvert",row:Math.abs(i-14),col:0}).newrod);
-							$('#newcore').find('tr').eq(j).find('td').eq(i).html(getMoveableAssembly({div:"secvert",row:Math.abs(i-14),col:0}).newrod);
+							$('#newcore').find('tr').eq(i).find('td').eq(j).html(getMoveableAssembly({div:"secvert",row:Math.abs(i-14),col:0}).newassembly);
+							$('#newcore').find('tr').eq(j).find('td').eq(i).html(getMoveableAssembly({div:"secvert",row:Math.abs(i-14),col:0}).newassembly);
 						}
-						$('#newcore').find('tr').eq(i).find('td').eq(j).css('background-color',getcolor(getMoveableAssembly({div:"secvert",row:Math.abs(i-14),col:0}).exposure,getMoveableAssembly({div:"secvert",row:Math.abs(i-14),col:0}).newrod));
-						$('#newcore').find('tr').eq(j).find('td').eq(i).css('background-color',getcolor(getMoveableAssembly({div:"secvert",row:Math.abs(i-14),col:0}).exposure,getMoveableAssembly({div:"secvert",row:Math.abs(i-14),col:0}).newrod));
+						$('#newcore').find('tr').eq(i).find('td').eq(j).css('background-color',getcolor(getMoveableAssembly({div:"secvert",row:Math.abs(i-14),col:0}).exposure,getMoveableAssembly({div:"secvert",row:Math.abs(i-14),col:0}).newassembly));
+						$('#newcore').find('tr').eq(j).find('td').eq(i).css('background-color',getcolor(getMoveableAssembly({div:"secvert",row:Math.abs(i-14),col:0}).exposure,getMoveableAssembly({div:"secvert",row:Math.abs(i-14),col:0}).newassembly));
 					}
 				}
 				else{
 					if(i==j&&Math.abs(7-i)<6&&i!=7){//angled
-						if(getMoveableAssembly({div:"secangle",row:5-Math.abs(7-i),col:Math.abs(7-i)}).newrod==0){
+						if(getMoveableAssembly({div:"secangle",row:5-Math.abs(7-i),col:Math.abs(7-i)}).newassembly==0){
 							$('#newcore').find('tr').eq(i).find('td').eq(i).html(" ");
 						}
 						else{
-							$('#newcore').find('tr').eq(i).find('td').eq(i).html(getMoveableAssembly({div:"secangle",row:5-Math.abs(7-i),col:Math.abs(7-i)}).newrod);
+							$('#newcore').find('tr').eq(i).find('td').eq(i).html(getMoveableAssembly({div:"secangle",row:5-Math.abs(7-i),col:Math.abs(7-i)}).newassembly);
 						}
-						if(getMoveableAssembly({div:"secangle",row:5-Math.abs(7-i),col:Math.abs(7-i)}).newrod==0){
+						if(getMoveableAssembly({div:"secangle",row:5-Math.abs(7-i),col:Math.abs(7-i)}).newassembly==0){
 							$('#newcore').find('tr').eq(14-i).find('td').eq(i).html(" ");
 						}
 						else{
-							$('#newcore').find('tr').eq(14-i).find('td').eq(i).html(getMoveableAssembly({div:"secangle",row:5-Math.abs(7-i),col:Math.abs(7-i)}).newrod);
+							$('#newcore').find('tr').eq(14-i).find('td').eq(i).html(getMoveableAssembly({div:"secangle",row:5-Math.abs(7-i),col:Math.abs(7-i)}).newassembly);
 						}
-						$('#newcore').find('tr').eq(i).find('td').eq(i).css('background-color',getcolor(getMoveableAssembly({div:"secangle",row:5-Math.abs(7-i),col:Math.abs(7-i)}).exposure,getMoveableAssembly({div:"secangle",row:5-Math.abs(7-i),col:Math.abs(7-i)}).newrod));
-						$('#newcore').find('tr').eq(14-i).find('td').eq(i).css('background-color',getcolor(getMoveableAssembly({div:"secangle",row:5-Math.abs(7-i),col:Math.abs(7-i)}).exposure,getMoveableAssembly({div:"secangle",row:5-Math.abs(7-i),col:Math.abs(7-i)}).newrod));
+						$('#newcore').find('tr').eq(i).find('td').eq(i).css('background-color',getcolor(getMoveableAssembly({div:"secangle",row:5-Math.abs(7-i),col:Math.abs(7-i)}).exposure,getMoveableAssembly({div:"secangle",row:5-Math.abs(7-i),col:Math.abs(7-i)}).newassembly));
+						$('#newcore').find('tr').eq(14-i).find('td').eq(i).css('background-color',getcolor(getMoveableAssembly({div:"secangle",row:5-Math.abs(7-i),col:Math.abs(7-i)}).exposure,getMoveableAssembly({div:"secangle",row:5-Math.abs(7-i),col:Math.abs(7-i)}).newassembly));
 					}
 				}
 			}
@@ -371,7 +373,7 @@ function repaint(){
 	}
 	for(var i=0;i<6;i++){//octant
 		for(var j=0;j<5-octms[i];j++){
-			if(getMoveableAssembly({div:"secoct",row:i,col:j}).newrod==0){
+			if(getMoveableAssembly({div:"secoct",row:i,col:j}).newassembly==0){
 				$('#newcore').find('tr').eq(i).find('td').eq(j+8).html(" ");
 				$('#newcore').find('tr').eq(i).find('td').eq(6-j).html(" ");
 				$('#newcore').find('tr').eq(14-i).find('td').eq(j+8).html(" ");
@@ -382,43 +384,43 @@ function repaint(){
 				$('#newcore').find('tr').eq(6-j).find('td').eq(14-i).html(" ");
 			}
 			else{
-				$('#newcore').find('tr').eq(i).find('td').eq(j+8).html(getMoveableAssembly({div:"secoct",row:i,col:j}).newrod);
-				$('#newcore').find('tr').eq(i).find('td').eq(6-j).html(getMoveableAssembly({div:"secoct",row:i,col:j}).newrod);
-				$('#newcore').find('tr').eq(14-i).find('td').eq(j+8).html(getMoveableAssembly({div:"secoct",row:i,col:j}).newrod);
-				$('#newcore').find('tr').eq(14-i).find('td').eq(6-j).html(getMoveableAssembly({div:"secoct",row:i,col:j}).newrod);
-				$('#newcore').find('tr').eq(j+8).find('td').eq(i).html(getMoveableAssembly({div:"secoct",row:i,col:j}).newrod);
-				$('#newcore').find('tr').eq(6-j).find('td').eq(i).html(getMoveableAssembly({div:"secoct",row:i,col:j}).newrod);
-				$('#newcore').find('tr').eq(j+8).find('td').eq(14-i).html(getMoveableAssembly({div:"secoct",row:i,col:j}).newrod);
-				$('#newcore').find('tr').eq(6-j).find('td').eq(14-i).html(getMoveableAssembly({div:"secoct",row:i,col:j}).newrod);
+				$('#newcore').find('tr').eq(i).find('td').eq(j+8).html(getMoveableAssembly({div:"secoct",row:i,col:j}).newassembly);
+				$('#newcore').find('tr').eq(i).find('td').eq(6-j).html(getMoveableAssembly({div:"secoct",row:i,col:j}).newassembly);
+				$('#newcore').find('tr').eq(14-i).find('td').eq(j+8).html(getMoveableAssembly({div:"secoct",row:i,col:j}).newassembly);
+				$('#newcore').find('tr').eq(14-i).find('td').eq(6-j).html(getMoveableAssembly({div:"secoct",row:i,col:j}).newassembly);
+				$('#newcore').find('tr').eq(j+8).find('td').eq(i).html(getMoveableAssembly({div:"secoct",row:i,col:j}).newassembly);
+				$('#newcore').find('tr').eq(6-j).find('td').eq(i).html(getMoveableAssembly({div:"secoct",row:i,col:j}).newassembly);
+				$('#newcore').find('tr').eq(j+8).find('td').eq(14-i).html(getMoveableAssembly({div:"secoct",row:i,col:j}).newassembly);
+				$('#newcore').find('tr').eq(6-j).find('td').eq(14-i).html(getMoveableAssembly({div:"secoct",row:i,col:j}).newassembly);
 			}
-			$('#newcore').find('tr').eq(i).find('td').eq(j+8).css('background-color',getcolor(getMoveableAssembly({div:"secoct",row:i,col:j}).exposure,getMoveableAssembly({div:"secoct",row:i,col:j}).newrod));
-			$('#newcore').find('tr').eq(i).find('td').eq(6-j).css('background-color',getcolor(getMoveableAssembly({div:"secoct",row:i,col:j}).exposure,getMoveableAssembly({div:"secoct",row:i,col:j}).newrod));
-			$('#newcore').find('tr').eq(14-i).find('td').eq(j+8).css('background-color',getcolor(getMoveableAssembly({div:"secoct",row:i,col:j}).exposure,getMoveableAssembly({div:"secoct",row:i,col:j}).newrod));
-			$('#newcore').find('tr').eq(14-i).find('td').eq(6-j).css('background-color',getcolor(getMoveableAssembly({div:"secoct",row:i,col:j}).exposure,getMoveableAssembly({div:"secoct",row:i,col:j}).newrod));
-			$('#newcore').find('tr').eq(j+8).find('td').eq(i).css('background-color',getcolor(getMoveableAssembly({div:"secoct",row:i,col:j}).exposure,getMoveableAssembly({div:"secoct",row:i,col:j}).newrod));
-			$('#newcore').find('tr').eq(6-j).find('td').eq(i).css('background-color',getcolor(getMoveableAssembly({div:"secoct",row:i,col:j}).exposure,getMoveableAssembly({div:"secoct",row:i,col:j}).newrod));
-			$('#newcore').find('tr').eq(j+8).find('td').eq(14-i).css('background-color',getcolor(getMoveableAssembly({div:"secoct",row:i,col:j}).exposure,getMoveableAssembly({div:"secoct",row:i,col:j}).newrod));
-			$('#newcore').find('tr').eq(6-j).find('td').eq(14-i).css('background-color',getcolor(getMoveableAssembly({div:"secoct",row:i,col:j}).exposure,getMoveableAssembly({div:"secoct",row:i,col:j}).newrod));
+			$('#newcore').find('tr').eq(i).find('td').eq(j+8).css('background-color',getcolor(getMoveableAssembly({div:"secoct",row:i,col:j}).exposure,getMoveableAssembly({div:"secoct",row:i,col:j}).newassembly));
+			$('#newcore').find('tr').eq(i).find('td').eq(6-j).css('background-color',getcolor(getMoveableAssembly({div:"secoct",row:i,col:j}).exposure,getMoveableAssembly({div:"secoct",row:i,col:j}).newassembly));
+			$('#newcore').find('tr').eq(14-i).find('td').eq(j+8).css('background-color',getcolor(getMoveableAssembly({div:"secoct",row:i,col:j}).exposure,getMoveableAssembly({div:"secoct",row:i,col:j}).newassembly));
+			$('#newcore').find('tr').eq(14-i).find('td').eq(6-j).css('background-color',getcolor(getMoveableAssembly({div:"secoct",row:i,col:j}).exposure,getMoveableAssembly({div:"secoct",row:i,col:j}).newassembly));
+			$('#newcore').find('tr').eq(j+8).find('td').eq(i).css('background-color',getcolor(getMoveableAssembly({div:"secoct",row:i,col:j}).exposure,getMoveableAssembly({div:"secoct",row:i,col:j}).newassembly));
+			$('#newcore').find('tr').eq(6-j).find('td').eq(i).css('background-color',getcolor(getMoveableAssembly({div:"secoct",row:i,col:j}).exposure,getMoveableAssembly({div:"secoct",row:i,col:j}).newassembly));
+			$('#newcore').find('tr').eq(j+8).find('td').eq(14-i).css('background-color',getcolor(getMoveableAssembly({div:"secoct",row:i,col:j}).exposure,getMoveableAssembly({div:"secoct",row:i,col:j}).newassembly));
+			$('#newcore').find('tr').eq(6-j).find('td').eq(14-i).css('background-color',getcolor(getMoveableAssembly({div:"secoct",row:i,col:j}).exposure,getMoveableAssembly({div:"secoct",row:i,col:j}).newassembly));
 		}
 	}
 }
 
-function recolor(div,row,col,exp,newrod){
-	if(newrod==0){
+function recolor(div,row,col,exp,newassembly){
+	if(newassembly==0){
 		$('#'+div).find('tr').eq(row).find('td').eq(col).html(' ');
 	}
 	else{
-		$('#'+div).find('tr').eq(row).find('td').eq(col).html(newrod);
+		$('#'+div).find('tr').eq(row).find('td').eq(col).html(newassembly);
 	}
-	$('#'+div).find('tr').eq(row).find('td').eq(col).css('background-color',getcolor(exp,newrod));
+	$('#'+div).find('tr').eq(row).find('td').eq(col).css('background-color',getcolor(exp,newassembly));
 }
 
 function switchCells(start,end){
 	var assembsToSwap = [getMoveableAssembly(start),getMoveableAssembly(end)];
 	insertAssembly(assembsToSwap[0],end);
 	insertAssembly(assembsToSwap[1],start);
-	recolor(start.div,start.row,start.col,assembsToSwap[1].exposure,assembsToSwap[1].newrod);//change for new rod-----------------------------
-	recolor(end.div,end.row,end.col,assembsToSwap[0].exposure,assembsToSwap[0].newrod);//change for new rod-----------------------------
+	recolor(start.div,start.row,start.col,assembsToSwap[1].exposure,assembsToSwap[1].newassembly);//change for new assembly-----------------------------
+	recolor(end.div,end.row,end.col,assembsToSwap[0].exposure,assembsToSwap[0].newassembly);//change for new assembly-----------------------------
 }
 
 function insertAssembly(insert,ref){//ref cell used for final position
@@ -570,26 +572,26 @@ function resetCore(){
 	}
 }
 
-//function to get number of new loaded assemblies of a specific type (0 will get total number of rods)
-function numbernewrods(a){
+//function to get number of new loaded assemblies of a specific type (0 will get total number of assemblys)
+function numbernewassemblys(a){
 	var counter=0;
 	for(var i=0;i<centarray.length;i++){
-		if(centarray[i].newrod==a){
+		if(centarray[i].newassembly==a){
 			counter = counter+1;
 		}
 	}
 	for(var i=0;i<angarray.length;i++){
-		if(angarray[i].newrod==a){
+		if(angarray[i].newassembly==a){
 			counter = counter+4;
 		}
 	}
 	for(var i=0;i<vertarray.length;i++){
-		if(vertarray[i].newrod==a){
+		if(vertarray[i].newassembly==a){
 			counter = counter+4;
 		}
 	}
 	for(var i=0;i<octantarray.length;i++){
-		if(octantarray[i].newrod==a){
+		if(octantarray[i].newassembly==a){
 			counter = counter+8;
 		}
 	}
@@ -597,47 +599,47 @@ function numbernewrods(a){
 }
 
 //function to get total number of new assemblies
-function totnewrods(){
+function totnewassemblys(){
 	var counter=0;
 	for(var i=0;i<centarray.length;i++){
-		if(centarray[i].newrod!=0){
+		if(centarray[i].newassembly!=0){
 			counter = counter+1;
 		}
 	}
 	for(var i=0;i<angarray.length;i++){
-		if(angarray[i].newrod!=0){
+		if(angarray[i].newassembly!=0){
 			counter = counter+4;
 		}
 	}
 	for(var i=0;i<vertarray.length;i++){
-		if(vertarray[i].newrod!=0){
+		if(vertarray[i].newassembly!=0){
 			counter = counter+4;
 		}
 	}
 	for(var i=0;i<octantarray.length;i++){
-		if(octantarray[i].newrod!=0){
+		if(octantarray[i].newassembly!=0){
 			counter = counter+8;
 		}
 	}
 	return counter;
 }
 
-function addnewrodfield(){
-	if($('input[name=rodselector]').length>0){
-		var myint=Number($('input[name=rodselector]').last().val());
+function addnewassemblyfield(){
+	if($('input[name=assemblyselector]').length>0){
+		var myint=Number($('input[name=assemblyselector]').last().val());
 	}
 	else{
 		var myint=0;
 	}
-	var formtext = "<div class=\'rodform\'>"+(myint+1)+"<strong></strong><input type=\"radio\" name=\"rodselector\" value="+(myint+1)+">#WABA<select name=\"WABA\"><option value=0>0</option><option value=4>4</option><option value=8>8</option><option value=12>12</option></select>#IFBA<select name=\"IFBA\"><option value=0>0</option><option value=32>32</option><option value=64>64</option><option value=96>96</option><option value=128>128</option><option value=156>156</option></select><input class=\"delbutton\" type=\"button\" value=\"Delete\"/></div>";
-	if($('.rodform').length>0){
-		$id("rodsettings").innerHTML =  $id("rodsettings").innerHTML+formtext;
+	var formtext = "<div class=\'assemblyform\'>"+(myint+1)+"<strong></strong><input type=\"radio\" name=\"assemblyselector\" value="+(myint+1)+">#WABA<select name=\"WABA\"><option value=0>0</option><option value=4>4</option><option value=8>8</option><option value=12>12</option></select>#IFBA<select name=\"IFBA\"><option value=0>0</option><option value=32>32</option><option value=64>64</option><option value=96>96</option><option value=128>128</option><option value=156>156</option></select><input class=\"delbutton\" type=\"button\" value=\"Delete\"/></div>";
+	if($('.assemblyform').length>0){
+		$id("assemblysettings").innerHTML =  $id("assemblysettings").innerHTML+formtext;
 	}
 	else{
-		$id("rodsettings").innerHTML =  $id("rodsettings").innerHTML+formtext;
-		$('input[name=rodselector]').prop("checked",true);
+		$id("assemblysettings").innerHTML =  $id("assemblysettings").innerHTML+formtext;
+		$('input[name=assemblyselector]').prop("checked",true);
 	}
-	$('#info_and_new').css('height',$('#newrods').height());
+	$('#info_and_new').css('height',$('#newassemblys').height());
 	$('.delbutton').on( "click",function(evt){
 		deletehandler(evt);
 	});
@@ -645,45 +647,45 @@ function addnewrodfield(){
 //make sure selected stays selected---------------------------------------
 
 function deletehandler(e){
-	//$(e.target).parent().find('input[name=rodselector]').val();//gets rod selector value to delete
-	//getdeletedvalue: $(e.target).parent().find('input[name=rodselector]').attr("value")
-	//loop through octants to remove all deleted rods - octants made at ~line235
-	var deletedval=$(e.target).parent().find('input[name=rodselector]').attr("value");
-	var currentselected = $('input[name=rodselector]:checked').attr("value");
-	if($('input[name=rodselector]').length>1){//if rod field is not only field
+	//$(e.target).parent().find('input[name=assemblyselector]').val();//gets assembly selector value to delete
+	//getdeletedvalue: $(e.target).parent().find('input[name=assemblyselector]').attr("value")
+	//loop through octants to remove all deleted assemblys - octants made at ~line235
+	var deletedval=$(e.target).parent().find('input[name=assemblyselector]').attr("value");
+	var currentselected = $('input[name=assemblyselector]:checked').attr("value");
+	if($('input[name=assemblyselector]').length>1){//if assembly field is not only field
 		//center
-		if(getMAArray("seccent")[arrPos("seccent",0,0)].newrod==deletedval){
-			getMAArray("seccent")[arrPos("seccent",0,0)].newrod=0;
+		if(getMAArray("seccent")[arrPos("seccent",0,0)].newassembly==deletedval){
+			getMAArray("seccent")[arrPos("seccent",0,0)].newassembly=0;
 			recolor("seccent",0,0,getMoveableAssembly({div:"seccent",row:0,col:0}).exposure,0);
 		}
 		//axial
 		for(var i=0;i<vertarray.length;i++){
-			if(getMAArray("secvert")[arrPos("secvert",i,0)].newrod==deletedval){
-				getMAArray("secvert")[arrPos("secvert",i,0)].newrod=0;
+			if(getMAArray("secvert")[arrPos("secvert",i,0)].newassembly==deletedval){
+				getMAArray("secvert")[arrPos("secvert",i,0)].newassembly=0;
 				recolor("secvert",i,0,getMoveableAssembly({div:"secvert",row:i,col:0}).exposure,0);
 			}
 		}
 		//angular
 		for(var i=0;i<angarray.length;i++){
-			if(getMAArray("secangle")[arrPos("secangle",i,4-i)].newrod==deletedval){
-				getMAArray("secangle")[arrPos("secangle",i,4-i)].newrod=0;
+			if(getMAArray("secangle")[arrPos("secangle",i,4-i)].newassembly==deletedval){
+				getMAArray("secangle")[arrPos("secangle",i,4-i)].newassembly=0;
 				recolor("secangle",i,4-i,getMoveableAssembly({div:"secangle",row:i,col:4-i}).exposure,0);
 			}
 		}
 		//octant
 		for(var i=0;i<octantarray.length;i++){
 			for(var j=0;j<5-octms[i];j++){
-				if(getMAArray("secoct")[arrPos("secoct",i,j)].newrod==deletedval){
-					getMAArray("secoct")[arrPos("secoct",i,j)].newrod=0;
+				if(getMAArray("secoct")[arrPos("secoct",i,j)].newassembly==deletedval){
+					getMAArray("secoct")[arrPos("secoct",i,j)].newassembly=0;
 					recolor("secoct",i,j,getMoveableAssembly({div:"secoct",row:i,col:j}).exposure,0);
 				}
 			}
 		}
 		repaint();
 		$(e.target).parent().remove();//removes assembly field
-		$('#info_and_new').css('height',$('#newrods').height());
+		$('#info_and_new').css('height',$('#newassemblys').height());
 		if(typeof currentselected!='undefined'){
-			$('input[name=rodselector]').each(function(){
+			$('input[name=assemblyselector]').each(function(){
 				if($(this).attr("value")==currentselected){
 					$(this).prop("checked",true);
 				}
@@ -694,61 +696,61 @@ function deletehandler(e){
 		}
 	}
 }
-//handles rod type deletions, ensure all rods of that type are set to newrod 0
+//handles assembly type deletions, ensure all assemblys of that type are set to newassembly 0
 //repaint all
 
 function dblclickhandler(e){
 	var ref = {div:$(e.target).parent().parent().parent().parent().attr('id'),row:$(e.target).parent().index(),col:$(e.target).index()};
-	if(typeof $('input[name=rodselector]:checked').val()!='undefined'){
+	if(typeof $('input[name=assemblyselector]:checked').val()!='undefined'){
 		switch(ref.div){
 			case "secoct":
-				if(octantarray[arrPos(ref.div,ref.row,ref.col)].newrod!=0){
-					octantarray[arrPos(ref.div,ref.row,ref.col)].newrod=0;
+				if(octantarray[arrPos(ref.div,ref.row,ref.col)].newassembly!=0){
+					octantarray[arrPos(ref.div,ref.row,ref.col)].newassembly=0;
 				}
 				else{
-					octantarray[arrPos(ref.div,ref.row,ref.col)].newrod = $('input[name=rodselector]:checked').val();
+					octantarray[arrPos(ref.div,ref.row,ref.col)].newassembly = $('input[name=assemblyselector]:checked').val();
 				}
 				break;
 			case "secangle":
-				if(angarray[arrPos(ref.div,ref.row,ref.col)].newrod!=0){
-					angarray[arrPos(ref.div,ref.row,ref.col)].newrod=0;
+				if(angarray[arrPos(ref.div,ref.row,ref.col)].newassembly!=0){
+					angarray[arrPos(ref.div,ref.row,ref.col)].newassembly=0;
 				}
 				else{
-					angarray[arrPos(ref.div,ref.row,ref.col)].newrod = $('input[name=rodselector]:checked').val();
+					angarray[arrPos(ref.div,ref.row,ref.col)].newassembly = $('input[name=assemblyselector]:checked').val();
 				}
 				break;
 			case "secvert":
-				if(vertarray[arrPos(ref.div,ref.row,ref.col)].newrod!=0){
-					vertarray[arrPos(ref.div,ref.row,ref.col)].newrod=0;
+				if(vertarray[arrPos(ref.div,ref.row,ref.col)].newassembly!=0){
+					vertarray[arrPos(ref.div,ref.row,ref.col)].newassembly=0;
 				}
 				else{
-					vertarray[arrPos(ref.div,ref.row,ref.col)].newrod = $('input[name=rodselector]:checked').val();
+					vertarray[arrPos(ref.div,ref.row,ref.col)].newassembly = $('input[name=assemblyselector]:checked').val();
 				}
 				break;
 			default:
-				if(centarray[arrPos(ref.div,ref.row,ref.col)].newrod!=0){
-					centarray[arrPos(ref.div,ref.row,ref.col)].newrod=0;
+				if(centarray[arrPos(ref.div,ref.row,ref.col)].newassembly!=0){
+					centarray[arrPos(ref.div,ref.row,ref.col)].newassembly=0;
 				}
 				else{
-					centarray[arrPos(ref.div,ref.row,ref.col)].newrod = $('input[name=rodselector]:checked').val();
+					centarray[arrPos(ref.div,ref.row,ref.col)].newassembly = $('input[name=assemblyselector]:checked').val();
 				}
 				break;
 		}
 	}
 	else{
 		Output(
-			"<p>"+now()+"</p><p class=\"indent\" style=\"color:red;\">	<strong>New rod type not selected<strong></p>"
+			"<p>"+now()+"</p><p class=\"indent\" style=\"color:red;\">	<strong>New assembly type not selected<strong></p>"
 		);
 	}
-	recolor(ref.div,ref.row,ref.col,getMoveableAssembly(ref).exposure,getMoveableAssembly(ref).newrod);
+	recolor(ref.div,ref.row,ref.col,getMoveableAssembly(ref).exposure,getMoveableAssembly(ref).newassembly);
 	repaint();
-	$('#freshassembs').html("<strong>"+totnewrods()+"</strong> / <strong>"+numbernewrods(0)+"</strong> / <strong>"+(Number(totnewrods())+Number(numbernewrods(0)))+"</strong>");
+	$('#freshassembs').html("<strong>"+totnewassemblys()+"</strong> / <strong>"+numbernewassemblys(0)+"</strong> / <strong>"+(Number(totnewassemblys())+Number(numbernewassemblys(0)))+"</strong>");
 }
 //ensure one button is checked at all times-------------------------------------
 
-//gets lowest available rod setting form number
+//gets lowest available assembly setting form number
 function getlowestavailform(){
-	if($('.rodform').length==0){
+	if($('.assemblyform').length==0){
 		return 1;
 	}
 	else{
@@ -756,10 +758,10 @@ function getlowestavailform(){
 		var exists =false;
 		var exitloop = false;
 		while(exitloop==false){
-			for(var i=0;i<$('input[name=rodselector]').length;i++){
-				if($('input[name=rodselector]').eq(i).val()==count){
+			for(var i=0;i<$('input[name=assemblyselector]').length;i++){
+				if($('input[name=assemblyselector]').eq(i).val()==count){
 					exists=true;
-					i=$('input[name=rodselector]').length;
+					i=$('input[name=assemblyselector]').length;
 				}
 			}
 			if(exists==false){
@@ -780,16 +782,21 @@ function outputCore(){
 		//in cell of same # and type, but rotation 1 (our tables),
 		//get originating table and number,
 		//place originating table and number but our initial rotation cell into new assembly array
-		var originatingnumber = getMAArray(celltype(allassemblies[i].layout.type))[allassemblies[i].layout.cell].pos;
-		var originatingtype = getMAArray(celltype(allassemblies[i].layout.type))[allassemblies[i].layout.cell].div;
-		//IF CELL IS NEW ROD, place new rod label in
-		if(getMAArray(celltype(allassemblies[i].layout.type))[allassemblies[i].layout.cell].newrod>0){
-			outputc.push("25--"+getMAArray(celltype(allassemblies[i].layout.type))[allassemblies[i].layout.cell].newrod);
+		var thisassembly = getMAArray(celltype(allassemblies[i].layout.type))[allassemblies[i].layout.cell];
+		//IF CELL IS NEW ROD, place new assembly label in
+		if(thisassembly.newassembly>0){
+			if(thisassembly.newassembly<10){
+				outputc.push("TYPE0"+thisassembly.newassembly);
+			}
+			else{
+				outputc.push("TYPE"+thisassembly.newassembly);
+			}
+			
 		}
-		//otherwise cell is not new rod, continue mapping
+		//otherwise cell is not new assembly, continue mapping
 		else{
 			for(var j=0;j<allassemblies.length;j++){
-				if(allassemblies[j].layout.rotation==allassemblies[i].layout.rotation&&(allassemblies[j].layout.cell==originatingnumber)&&(celltype(allassemblies[j].layout.type)==originatingtype)){
+				if(allassemblies[j].layout.rotation==allassemblies[i].layout.rotation&&(allassemblies[j].layout.cell==thisassembly.pos)&&(celltype(allassemblies[j].layout.type)==thisassembly.div)){
 					outputc.push(allassemblies[j].label);
 					j=allassemblies.length;
 				}
@@ -831,7 +838,7 @@ function generateresults(){
 	fileresults = fileresults.concat("\n\'COM\'               SERIAL   NUMBER TO    FUEL    BATCH\n\'COM\'               LABEL     CREATE	  TYPE   NUMBER\n");
 	//FUE NEW CARDS-------------- EX:\'FUE.NEW\' \'TYPE01\', \'sil00\',	  97,        44,    ,,1/\n ----------------------------------------
 		//	'FUE.NEW' 'TYPE01', 'sil00',	  97,        44,    ,,1/
-		// 97 - number of rod type
+		// 97 - number of assembly type
 		// 44 -
 		// 1  -
 		//-------------------------------------------------------------------------------
@@ -939,9 +946,9 @@ function getBlankSpace(row){
 	return null;
 }
 
-//make sure output from silicide rods is xx--01 not xx--1
+//make sure output from silicide assemblys is xx--01 not xx--1
 
-//no core resize on rod insertion ------------------------------------------------
+//no core resize on assembly insertion ------------------------------------------------
 
 //double click insert on new core, not octant
 //--------------------------------------------------------------------------------
@@ -959,14 +966,14 @@ function getBlankSpace(row){
  
  //enrichments -------------------------------------------------------
  
- //number of rods of a specific type near rod form ------------------------------
+ //number of assemblys of a specific type near assembly form ------------------------------
  
  //keep WABA IFBA RADIO values on field addition and deleteion-------------
  
  //get old cycle end date, from DEP CYC like cycle number (variable already set,OCDate)----------------------------------------------
  
  //maybe
- //check # silicide rods
+ //check # silicide assemblys
  //re-orient half-removals div over octant------------------------------------
  //half-removal dynamic table size--------------------------------------------
  //add half-removal functionality, (removing and readding)--------------------
