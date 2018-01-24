@@ -8,6 +8,8 @@ var octantarray = [];
 var newassemblies = [];
 var labels = [];
 var exposures =[];
+var typemap;
+var segdata;
 //ON DEPLOYMENT COLLAPSE(/**/)
 var output;
 var dragSrc; //initialize element to hold item drag source
@@ -35,7 +37,7 @@ function Assembly(label, exposure,layout,row,col) {
 function moveableAssembly(originalsection,octantnumber,newassembly,exposure){
 	this.div = originalsection;
 	this.exposure = exposure;
-	this.newassembly = newassembly;//0 if not new, increment otherwise based on new assemblys
+	this.newassembly = newassembly;//0 if not new, increment otherwise based on new assemblies
 	this.pos = octantnumber;//position within the octant
 }
 
@@ -227,7 +229,30 @@ function loadWorkspace(rawfiletext){
 		}
 		exposures.push(explinearray);
 	}
-	//fill allassemblies with mapped exposures
+	//get all fuel type mappings
+	typemap = [];
+	var rawTypeMaps = [];
+	rawTypeMaps = rawfiletext.split("Serial  Label   ---------Previous-------------------- -Present--");
+	for(var i=1;i<rawTypeMaps.length;i++){
+		var rawTypeMap=rawTypeMaps[i].split("_________________________________________________________________________________________")[0].match(/[a-zA-Z0-9\-]{6}\s{3}\(.{6}\s+\d+/g);
+		for(var j=0;j<rawTypeMap.length;j++){
+			var typeline = rawTypeMap[j].split(/\s{3,7}/g);
+			typemap.push({lab:typeline[0],typ:typeline[2]});
+		}
+	}
+	//get fuel segment data if available
+	segdata = [];
+	var rawsegments = rawfiletext.split("Fueled Segments:")[1].split("Reflector Segments")[0];
+	var segs = rawsegments.match(/\d+\s{2}\S+\s+\d\.\d+\s{6}\d\.\d+\s{8}\-{6}\s+\S+\s+\d+/g);
+	for(var i=0;i<segs.length;i++){
+		var seg = segs[i].split(/\s+/g);
+		var nifba=0;
+		if(seg[5]!="------"){
+			nifba=Number(seg[5])*100/3
+		}
+		segdata.push({typ:seg[0],name:seg[1],enr:seg[3],waba:Number(seg[6]),ifba:nifba});
+	}
+	//fill allassemblies
 	allassemblies = [];
 	for(var i=0;i<labels.length;i++){
 		allassemblies.push(new Assembly(labels[i].label,exposures[Math.abs(7-labels[i].col)][Math.abs(7-labels[i].row)],{cell:celllayout[i]-1,type:typelayout[i],rotation:rotationallayout[i]},labels[i].row,labels[i].col));
@@ -265,7 +290,7 @@ function loadWorkspace(rawfiletext){
 				}
 			}
 	//load assembly stats
-	$('#freshassembs').html("<strong>"+totnewassemblys()+"</strong> / <strong>"+numbernewassemblys(0)+"</strong> / <strong>"+(Number(totnewassemblys())+Number(numbernewassemblys(0)))+"</strong>");
+	$('#freshassembs').html("<strong>"+totnewassemblies()+"</strong> / <strong>"+numbernewassemblies(0)+"</strong> / <strong>"+(Number(totnewassemblies())+Number(numbernewassemblies(0)))+"</strong>");
 }
 
 function getcolor(exposure,newassembly){
@@ -312,6 +337,7 @@ function handleAssemblyDrop(e) {
 }
 
 function repaint(){
+	$('#countedwabas').html(totalWABA());
 	for(var i=0;i<15;i++){
 		for(var j=0;j<15;j++){
 			if(i==7&&j==7){//center
@@ -572,8 +598,8 @@ function resetCore(){
 	}
 }
 
-//function to get number of new loaded assemblies of a specific type (0 will get total number of assemblys)
-function numbernewassemblys(a){
+//function to get number of new loaded assemblies of a specific type (0 will get total number of assemblies)
+function numbernewassemblies(a){
 	var counter=0;
 	for(var i=0;i<centarray.length;i++){
 		if(centarray[i].newassembly==a){
@@ -599,7 +625,7 @@ function numbernewassemblys(a){
 }
 
 //function to get total number of new assemblies
-function totnewassemblys(){
+function totnewassemblies(){
 	var counter=0;
 	for(var i=0;i<centarray.length;i++){
 		if(centarray[i].newassembly!=0){
@@ -625,34 +651,33 @@ function totnewassemblys(){
 }
 
 function addnewassemblyfield(){
-	if($('input[name=assemblyselector]').length>0){
-		var myint=Number($('input[name=assemblyselector]').last().val());
+	if($('input[name=assemblieselector]').length>0){
+		var myint=Number($('input[name=assemblieselector]').last().val());
 	}
 	else{
 		var myint=0;
 	}
-	var formtext = "<div class=\'assemblyform\'>"+(myint+1)+"<strong></strong><input type=\"radio\" name=\"assemblyselector\" value="+(myint+1)+">#WABA<select name=\"WABA\"><option value=0>0</option><option value=4>4</option><option value=8>8</option><option value=12>12</option></select>#IFBA<select name=\"IFBA\"><option value=0>0</option><option value=32>32</option><option value=64>64</option><option value=96>96</option><option value=128>128</option><option value=156>156</option></select><input class=\"delbutton\" type=\"button\" value=\"Delete\"/></div>";
+	var formtext = "<div class=\'assemblyform\'>"+(myint+1)+"<strong></strong><input type=\"radio\" name=\"assemblieselector\" value="+(myint+1)+">#WABA<select name=\"WABA\" class=\"wabasel\"><option value=0>0</option><option value=4>4</option><option value=8>8</option><option value=12>12</option></select>#IFBA<select name=\"IFBA\"><option value=0>0</option><option value=32>32</option><option value=64>64</option><option value=96>96</option><option value=128>128</option><option value=156>156</option></select><input class=\"delbutton\" type=\"button\" value=\"Delete\"/></div>";
 	if($('.assemblyform').length>0){
-		$id("assemblysettings").innerHTML =  $id("assemblysettings").innerHTML+formtext;
+		$id("assembliesettings").innerHTML =  $id("assembliesettings").innerHTML+formtext;
 	}
 	else{
-		$id("assemblysettings").innerHTML =  $id("assemblysettings").innerHTML+formtext;
-		$('input[name=assemblyselector]').prop("checked",true);
+		$id("assembliesettings").innerHTML =  $id("assembliesettings").innerHTML+formtext;
+		$('input[name=assemblieselector]').prop("checked",true);
 	}
-	$('#info_and_new').css('height',$('#newassemblys').height());
+	$('#info_and_new').css('height',$('#newassemblies').height());
 	$('.delbutton').on( "click",function(evt){
 		deletehandler(evt);
 	});
+	$('.wabasel').on("click",function(e){
+		$('#countedwabas').html(totalWABA());
+	});
 }
-//make sure selected stays selected---------------------------------------
 
 function deletehandler(e){
-	//$(e.target).parent().find('input[name=assemblyselector]').val();//gets assembly selector value to delete
-	//getdeletedvalue: $(e.target).parent().find('input[name=assemblyselector]').attr("value")
-	//loop through octants to remove all deleted assemblys - octants made at ~line235
-	var deletedval=$(e.target).parent().find('input[name=assemblyselector]').attr("value");
-	var currentselected = $('input[name=assemblyselector]:checked').attr("value");
-	if($('input[name=assemblyselector]').length>1){//if assembly field is not only field
+	var deletedval=$(e.target).parent().find('input[name=assemblieselector]').attr("value");
+	var currentselected = $('input[name=assemblieselector]:checked').attr("value");
+	if($('input[name=assemblieselector]').length>1){//if assembly field is not only field
 		//center
 		if(getMAArray("seccent")[arrPos("seccent",0,0)].newassembly==deletedval){
 			getMAArray("seccent")[arrPos("seccent",0,0)].newassembly=0;
@@ -683,9 +708,9 @@ function deletehandler(e){
 		}
 		repaint();
 		$(e.target).parent().remove();//removes assembly field
-		$('#info_and_new').css('height',$('#newassemblys').height());
+		$('#info_and_new').css('height',$('#newassemblies').height());
 		if(typeof currentselected!='undefined'){
-			$('input[name=assemblyselector]').each(function(){
+			$('input[name=assemblieselector]').each(function(){
 				if($(this).attr("value")==currentselected){
 					$(this).prop("checked",true);
 				}
@@ -696,19 +721,18 @@ function deletehandler(e){
 		}
 	}
 }
-//handles assembly type deletions, ensure all assemblys of that type are set to newassembly 0
-//repaint all
+//handles assembly type deletions, ensure all assemblies of that type are set to newassembly 0
 
 function dblclickhandler(e){
 	var ref = {div:$(e.target).parent().parent().parent().parent().attr('id'),row:$(e.target).parent().index(),col:$(e.target).index()};
-	if(typeof $('input[name=assemblyselector]:checked').val()!='undefined'){
+	if(typeof $('input[name=assemblieselector]:checked').val()!='undefined'){
 		switch(ref.div){
 			case "secoct":
 				if(octantarray[arrPos(ref.div,ref.row,ref.col)].newassembly!=0){
 					octantarray[arrPos(ref.div,ref.row,ref.col)].newassembly=0;
 				}
 				else{
-					octantarray[arrPos(ref.div,ref.row,ref.col)].newassembly = $('input[name=assemblyselector]:checked').val();
+					octantarray[arrPos(ref.div,ref.row,ref.col)].newassembly = $('input[name=assemblieselector]:checked').val();
 				}
 				break;
 			case "secangle":
@@ -716,7 +740,7 @@ function dblclickhandler(e){
 					angarray[arrPos(ref.div,ref.row,ref.col)].newassembly=0;
 				}
 				else{
-					angarray[arrPos(ref.div,ref.row,ref.col)].newassembly = $('input[name=assemblyselector]:checked').val();
+					angarray[arrPos(ref.div,ref.row,ref.col)].newassembly = $('input[name=assemblieselector]:checked').val();
 				}
 				break;
 			case "secvert":
@@ -724,7 +748,7 @@ function dblclickhandler(e){
 					vertarray[arrPos(ref.div,ref.row,ref.col)].newassembly=0;
 				}
 				else{
-					vertarray[arrPos(ref.div,ref.row,ref.col)].newassembly = $('input[name=assemblyselector]:checked').val();
+					vertarray[arrPos(ref.div,ref.row,ref.col)].newassembly = $('input[name=assemblieselector]:checked').val();
 				}
 				break;
 			default:
@@ -732,7 +756,7 @@ function dblclickhandler(e){
 					centarray[arrPos(ref.div,ref.row,ref.col)].newassembly=0;
 				}
 				else{
-					centarray[arrPos(ref.div,ref.row,ref.col)].newassembly = $('input[name=assemblyselector]:checked').val();
+					centarray[arrPos(ref.div,ref.row,ref.col)].newassembly = $('input[name=assemblieselector]:checked').val();
 				}
 				break;
 		}
@@ -744,9 +768,9 @@ function dblclickhandler(e){
 	}
 	recolor(ref.div,ref.row,ref.col,getMoveableAssembly(ref).exposure,getMoveableAssembly(ref).newassembly);
 	repaint();
-	$('#freshassembs').html("<strong>"+totnewassemblys()+"</strong> / <strong>"+numbernewassemblys(0)+"</strong> / <strong>"+(Number(totnewassemblys())+Number(numbernewassemblys(0)))+"</strong>");
+	$('#freshassembs').html("<strong>"+totnewassemblies()+"</strong> / <strong>"+numbernewassemblies(0)+"</strong> / <strong>"+(Number(totnewassemblies())+Number(numbernewassemblies(0)))+"</strong>");
 }
-//ensure one button is checked at all times-------------------------------------
+
 
 //gets lowest available assembly setting form number
 function getlowestavailform(){
@@ -758,10 +782,10 @@ function getlowestavailform(){
 		var exists =false;
 		var exitloop = false;
 		while(exitloop==false){
-			for(var i=0;i<$('input[name=assemblyselector]').length;i++){
-				if($('input[name=assemblyselector]').eq(i).val()==count){
+			for(var i=0;i<$('input[name=assemblieselector]').length;i++){
+				if($('input[name=assemblieselector]').eq(i).val()==count){
 					exists=true;
-					i=$('input[name=assemblyselector]').length;
+					i=$('input[name=assemblieselector]').length;
 				}
 			}
 			if(exists==false){
@@ -927,6 +951,37 @@ function generateresults(){
 	}
 }
 
+function totalWABA(){
+	var wabacount =0;
+	$('input[name=assemblieselector]').each(function(){
+		wabacount = wabacount+(numbernewassemblies($(this).val())*Number($(this).parent().find('select').find("option:selected").attr("value")));
+	});
+	return wabacount;
+}
+
+function getsegdata(segnum){
+	for(var i=0;i<segdata.length;i++){
+		if(segdata[i].typ==segnum){
+			return segdata[i];
+		}
+	}
+}
+
+function getsegbynum(inlabel){
+	for(var i=0;i<allassemblies.length;i++){
+		if(allassemblies[i].label==inlabel){
+			for(var j=0;j<typemap.length;j++){
+				if(typemap[i].lab==inlabel){
+					return getsegdata(typemap[i].typ);
+				}
+			}
+		}
+	}
+	return null;
+}
+
+getcellsize(15)
+
 function getStartEndDate(){
 	//for cycle24 should return 
 	return "20181227 20181129";
@@ -946,14 +1001,22 @@ function getBlankSpace(row){
 	return null;
 }
 
-//make sure output from silicide assemblys is xx--01 not xx--1
+//New FUE.ZONs and numbering -----------------------------------------------------
+
+//FUE.NEW for each new type of assembly-------------------------------------------
+
+//get waba segments that should be changed in order to remove wabas---------------
+
+//enrichment field--------------------------------------------------------------
+
+//ensure one button is checked at all times-------------------------------------
+//ensure waba/ifba values stay on add /del ---------------------------------
+
+//add #dropArea re-appearance method ----------------------------------------
 
 //no core resize on assembly insertion ------------------------------------------------
 
-//double click insert on new core, not octant
-//--------------------------------------------------------------------------------
-
-//function to verify exposure is within limits
+//function to verify exposure is within limits, as well as other limits.
 //-------------------------------------------------------------------------------
  
  //generate TAB.TFU, FUE.ZON, etc,
@@ -962,30 +1025,14 @@ function getBlankSpace(row){
  //use generated TAB.TFU/etc and full core to generate .inp file
  //-------------------------------------------------------------------------------
  
- //fuel zones -----------------------------------------------------------
- 
- //enrichments -------------------------------------------------------
- 
- //number of assemblys of a specific type near assembly form ------------------------------
+ //number of assemblies of a specific type near assembly form ------------------------------
  
  //keep WABA IFBA RADIO values on field addition and deleteion-------------
  
  //get old cycle end date, from DEP CYC like cycle number (variable already set,OCDate)----------------------------------------------
  
- //maybe
- //check # silicide assemblys
- //re-orient half-removals div over octant------------------------------------
- //half-removal dynamic table size--------------------------------------------
- //add half-removal functionality, (removing and readding)--------------------
- 
  
  //remove BR from calls to output ----------------------------------------------------
   //change all calls to output to contain <p class="indent"> ----------------------------------------------------
   
-  //reposition workspace--------------------------------------
-  
   //re-order script functions etc-------------------------------------------
-  
-  //output-------------------------------------
-  
-  //load from old state point in webspage (locally saved)--------------------------------

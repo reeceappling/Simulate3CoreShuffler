@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><!-- DONT RUN AS ADMINISTRATOR ----------BECAUSE      --------------------------------->
+<html lang="en">
 	<head>
 		<meta charset="utf-8">
 		<title>Shuffler</title>
@@ -41,24 +41,21 @@
 			<div style="height:20px;background:linear-gradient(rgb(230,230,230),white);"></div>
 			<div id="info_and_new" class="workarea" style="background-color:white;">
 				<div class="toolbar"><input type="button" value="Reset Core" onclick="resetCore();" /></div>
-				<div id="coreinfo" class="toolbar"><strong>Fresh</strong>/<strong>Old</strong>/<strong>Total</strong> Assemblies: <span id="freshassembs">0/0/0</span></div>
-				<div id="newassemblys" class="toolbar">
+				<div id="coreinfo" class="toolbar"><strong>Fresh</strong>/<strong>Old</strong>/<strong>Total</strong> Assemblies: <span id="freshassembs">0/0/0</span><br><strong>WABAs in core: <span id="countedwabas"></span></strong></div>
+				<div id="newassemblies" class="toolbar">
 					<div id="assemblytools">
 						<input type="button" value="Add a new assembly field" onclick="addnewassemblyfield()" id="addnewassemblyfield"/>
 					</div>
-					<div id="assemblysettings">
+					<div id="assembliesettings">
 					</div>
 				</div>
-				<!-- stats, #newassemblys, #oldassemblys--------------------------------------------------------------->
-				<!-- fields, new assembly stuff------------------------------------------------------------------->
-				<!-- buttons, reset core, download input file ----------------------------------------------->
 			</div>
 			<div style="height:20px;background:linear-gradient(white,black);"></div>
 			<div style="height:10px;background-color:black;"></div>
 			<div id="corearea" class="workarea">
 				<div id="oldcore" class="fullcore">
 				</div>
-				<div id="octant"><!-- listeners and click functionality, mapping,etc ----------------------->
+				<div id="octant">
 					<div id="secsI" class="section"><div id="secvert" class="section"></div><div id="seccent" class="section"></div></div>
 					<div id="secsII" class="section"><div id="secoct" class="section"></div><div id="secangle" class="section"></div></div>
 				</div>
@@ -75,6 +72,6 @@
 			<div style="height:20px;background:linear-gradient(white,black);"></div>
 		</div>
 		
-		<!-- End of documant -->
+		<!-- End of document -->
 	</body>
 </html>
